@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.XuanpaiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.xuanpai_name as xuanpaiName
+        ,a.xuanpai_types as xuanpaiTypes
+        ,a.zhuangtai_types as zhuangtaiTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.XuanpaiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM xuanpai  a
+
+        <where>
+            <if test=" params.xuanpaiName != '' and params.xuanpaiName != null and params.xuanpaiName != 'null' ">
+                and a.xuanpai_name like CONCAT('%',#{params.xuanpaiName},'%')
+            </if>
+            <if test="params.xuanpaiTypes != null">
+                and a.xuanpai_types = #{params.xuanpaiTypes}
+            </if>
+            <if test="params.zhuangtaiTypes != null">
+                and a.zhuangtai_types = #{params.zhuangtaiTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>

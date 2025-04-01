@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ShangpaiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yonghu_id as yonghuId
+        ,a.xuanpai_id as xuanpaiId
+        ,a.shangpai_types as shangpaiTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ShangpaiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,xuanpai.xuanpai_name as xuanpaiName
+        ,xuanpai.xuanpai_types as xuanpaiTypes
+        ,xuanpai.zhuangtai_types as zhuangtaiTypes
+        ,xuanpai.insert_time as insertTime
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.sex_types as sexTypes
+        ,yonghu.diandongche_types as diandongcheTypes
+        ,yonghu.xuanpai_types as xuanpaiTypes
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_photo as yonghuPhoto
+
+        FROM shangpai  a
+        left JOIN xuanpai xuanpai ON a.xuanpai_id = xuanpai.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.yonghuId != null">
+                and a.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test="params.xuanpaiId != null">
+                and a.xuanpai_id = #{params.xuanpaiId}
+            </if>
+            <if test="params.shangpaiTypes != null">
+                and a.shangpai_types = #{params.shangpaiTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+            <if test=" params.xuanpaiName != '' and params.xuanpaiName != null and params.xuanpaiName != 'null' ">
+                and xuanpai.xuanpai_name like CONCAT('%',#{params.xuanpaiName},'%')
+            </if>
+            <if test="params.xuanpaiTypes != null">
+                and xuanpai.xuanpai_types = #{params.xuanpaiTypes}
+            </if>
+
+            <if test="params.zhuangtaiTypes != null">
+                and xuanpai.zhuangtai_types = #{params.zhuangtaiTypes}
+            </if>
+
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(xuanpai.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(xuanpai.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test="params.sexTypes != null">
+                and yonghu.sex_types = #{params.sexTypes}
+            </if>
+
+            <if test="params.diandongcheTypes != null">
+                and yonghu.diandongche_types = #{params.diandongcheTypes}
+            </if>
+
+            <if test="params.xuanpaiTypes != null">
+                and yonghu.xuanpai_types = #{params.xuanpaiTypes}
+            </if>
+
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.BaoxianDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.baoxian_name as baoxianName
+        ,a.baoxian_types as baoxianTypes
+        ,a.baoxian_money as baoxianMoney
+        ,a.baoxian_content as baoxianContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.BaoxianView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM baoxian  a
+
+        <where>
+            <if test=" params.baoxianName != '' and params.baoxianName != null and params.baoxianName != 'null' ">
+                and a.baoxian_name like CONCAT('%',#{params.baoxianName},'%')
+            </if>
+            <if test="params.baoxianTypes != null">
+                and a.baoxian_types = #{params.baoxianTypes}
+            </if>
+            <if test="params.baoxianMoneyStart != null ">
+                <![CDATA[  and a.baoxian_money >= #{params.baoxianMoneyStart}   ]]>
+            </if>
+            <if test="params.baoxianMoneyEnd != null ">
+                <![CDATA[  and a.baoxian_money <= #{params.baoxianMoneyEnd}   ]]>
+            </if>
+            <if test=" params.baoxianContent != '' and params.baoxianContent != null and params.baoxianContent != 'null' ">
+                and a.baoxian_content like CONCAT('%',#{params.baoxianContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>
